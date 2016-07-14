@@ -1,0 +1,25 @@
+{
+  "name": "rabbit-conversation",
+  "version": "1.0.0",
+  "description": "A RPC module for RabbitMQ",
+  "main": "lib/rabbit-conversation",
+  "scripts": {
+    "test": "mocha test/."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TBear79/rabbit-conversation.git"
+  },
+  "keywords": [
+    "RabbitMQ",
+    "RPC",
+    "rabbit-chatter",
+    "rabbit-listener"
+  ],
+  "author": "Thorbjørn Jelgren",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/TBear79/rabbit-conversation/issues"
+  },
+  "homepage": "https://github.com/TBear79/rabbit-conversation#readme"
+}
