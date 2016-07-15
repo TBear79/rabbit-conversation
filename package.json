@@ -21,5 +21,10 @@
   "bugs": {
     "url": "https://github.com/TBear79/rabbit-conversation/issues"
   },
-  "homepage": "https://github.com/TBear79/rabbit-conversation#readme"
+  "homepage": "https://github.com/TBear79/rabbit-conversation#readme",
+  "dependencies": {
+    "node-uuid": "^1.4.7",
+    "rabbit-chatter": "^1.0.5",
+    "rabbit-listener": "^1.0.0"
+  }
 }
