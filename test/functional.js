@@ -1,5 +1,3 @@
-//Not quite unit tests as they depend on RabbitMq to be installed
-
 //REQUIREMENTS:
 //npm install in test-dir
 //RabbitMq installed locally
@@ -13,10 +11,10 @@ const expect = chai.expect;
 const sinon = require('sinon');
 const amqplib = require('amqplib');
 
-const rabbitChatter = require('../lib/rabbit-chatter.js');
+const rabbitConversation = require('../lib/rabbit-conversation.js');
 
-describe('RabbitMq connection', () => {
-	describe('Test if messages are emittet to the exchange', function() {
+describe('RabbitMq', () => {
+	describe('Test if A reply is returned', function() {
 		this.timeout(30000);
 
 		const testAppId1 = 'TESTAPPIDALL';
@@ -36,14 +34,14 @@ describe('RabbitMq connection', () => {
 		}
 
 		
-		const rabbit = rabbitChatter.rabbit(options);
-
+		var rabbit1 = rabbitConversation.rabbit(options);
+		
 		before(function () { 
 		});
 		after(function () { 
 		});
 
-		it('should return the correct message from queue',  (done) => {
+		it('should set up a call via rabbit-conversation, start a listen-server and return a reply. ',  (done) => {
 			let connection; 
 			let connectionCloseTimerId;
 			const testContent = 'TESTING 123';
@@ -51,61 +49,16 @@ describe('RabbitMq connection', () => {
 			
 			let msgCount = 0;
 
-			setTimeout(() => { rabbit.chat(testContent, { correlationId: testCorrelationId }); }, 50);
-
-			return amqplib
-				 .connect(options.protocol + '://' + options.host)
-				.then((conn) => { connection = conn; return conn.createChannel(); })
-				.then((channel) => {
-					return channel.assertExchange(options.exchangeName, options.exchangeType, {durable: options.durable})
-						.then((ok) => {
-							return channel.assertQueue('', {exclusive: true})
-					    				.then((q) => {
-					    					channel.bindQueue(q.queue, options.exchangeName, '');
-
-					    					return channel.consume(q.queue, (msg) => {
-					    						
-					    						msgCount++;
-
-					    						clearTimeout(connectionCloseTimerId);
-
-										        connectionCloseTimerId = setTimeout(() => { 
-										        	expect(msg.content.toString()).to.equal(testContent);
-													expect(msg.properties.appId).to.equal(testAppId1);
-													expect(msg.properties.correlationId).to.equal(testCorrelationId);
-										        	expect(msgCount).to.equal(1);
-										        	
-										        	connection.close(); 
-
-										        	done();
-										        }, 500);
-
-										    }, {noAck: true});
-					    				})
-
-					  	});
-				})
-				.catch((ex) => { throw ex; });
-
-			
-			
-		});
-
-		
-		it('should send 1000 messages and receive them all',  (done) => {
-
-			const numberOfMessagesToSend = 1000;
-
-			let connection; 
-			let connectionCloseTimerId;
-			let msgCount = 0;
-
 			setTimeout(() => { 
-				for(let i = 0; i < numberOfMessagesToSend; i++){
-					rabbit.chat("TESTING"); 
-				}				
-			}, 500);
+				//Start conversation here and do asserts on the reply
 
+				rabbit1.start(testContent, (msg) => { 
+					expect(msg.content.toString()).to.equal("DIDYOUSAY: " + testContent + "???");
+					done();
+				});
+			 }, 50);
+
+			 //Set up a server chat 
 			return amqplib
 				 .connect(options.protocol + '://' + options.host)
 				.then((conn) => { connection = conn; return conn.createChannel(); })
@@ -117,19 +70,9 @@ describe('RabbitMq connection', () => {
 					    					channel.bindQueue(q.queue, options.exchangeName, '');
 
 					    					return channel.consume(q.queue, (msg) => {
-					    						
-					    						msgCount++;
-
-					    						clearTimeout(connectionCloseTimerId);
-
-										        connectionCloseTimerId = setTimeout(() => { 
-										        	expect(msgCount).to.equal(numberOfMessagesToSend);
-										        	
-										        	connection.close(); 
-
-										        	done();
-										        }, 500);
-
+					    						channel.sendToQueue(msg.properties.replyTo,
+												new Buffer("DIDYOUSAY: " + msg.content.toString() + "???"),
+												{correlationId: msg.properties.correlationId});
 										    }, {noAck: true});
 					    				})
 
@@ -137,8 +80,6 @@ describe('RabbitMq connection', () => {
 				})
 				.catch((ex) => { throw ex; });
 		});
-
-
 	});
 });
 

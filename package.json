@@ -26,5 +26,10 @@
     "node-uuid": "^1.4.7",
     "rabbit-chatter": "^1.0.5",
     "rabbit-listener": "^1.0.0"
+  },
+  "devDependencies": {
+    "amqplib": "^0.4.2",
+    "chai": "^3.5.0",
+    "sinon": "^1.17.4"
   }
 }
