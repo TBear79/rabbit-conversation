@@ -30,6 +30,7 @@ describe('RabbitMq', () => {
 			host: 'localhost',
 			exchangeName: 'TEST',
 			exchangeType: 'topic',
+			routingKey: 'TestRoute',
 			durable: false
 		}
 
@@ -65,14 +66,15 @@ describe('RabbitMq', () => {
 				.then((channel) => {
 					return channel.assertExchange(options.exchangeName, options.exchangeType, {durable: options.durable})
 						.then((ok) => {
-							return channel.assertQueue('', {exclusive: true})
+							return channel.assertQueue(options.routingKey, {exclusive: true})
 					    				.then((q) => {
-					    					channel.bindQueue(q.queue, options.exchangeName, '');
+					    					channel.bindQueue(q.queue, options.exchangeName, options.routingKey);
 
 					    					return channel.consume(q.queue, (msg) => {
+												console.log("TESTSERVER " + msg.properties.replyTo + ' ---- ' + msg.properties.correlationId);
 					    						channel.sendToQueue(msg.properties.replyTo,
-												new Buffer("DIDYOUSAY: " + msg.content.toString() + "???"),
-												{correlationId: msg.properties.correlationId});
+												 	new Buffer("DIDYOUSAY: " + msg.content.toString() + "???"),
+												 	{correlationId: msg.properties.correlationId});
 										    }, {noAck: true});
 					    				})
 

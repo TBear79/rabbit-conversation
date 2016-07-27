@@ -24,8 +24,8 @@
   "homepage": "https://github.com/TBear79/rabbit-conversation#readme",
   "dependencies": {
     "node-uuid": "^1.4.7",
-    "rabbit-chatter": "^1.0.5",
-    "rabbit-listener": "^1.0.0"
+    "rabbit-chatter": "^1.1.2",
+    "rabbit-listener": "^1.0.2"
   },
   "devDependencies": {
     "amqplib": "^0.4.2",
