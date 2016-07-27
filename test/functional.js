@@ -52,9 +52,9 @@ describe('RabbitMq', () => {
 
 			setTimeout(() => { 
 				//Start conversation here and do asserts on the reply
-
-				rabbit1.start(testContent, (msg) => { 
+				rabbit1.start(testContent, (msg, correlationId) => { 
 					expect(msg.content.toString()).to.equal("DIDYOUSAY: " + testContent + "???");
+					expect(msg.properties.correlationId).to.equal(correlationId);
 					done();
 				});
 			 }, 50);
@@ -71,8 +71,7 @@ describe('RabbitMq', () => {
 					    					channel.bindQueue(q.queue, options.exchangeName, options.routingKey);
 
 					    					return channel.consume(q.queue, (msg) => {
-												console.log("TESTSERVER " + msg.properties.replyTo + ' ---- ' + msg.properties.correlationId);
-					    						channel.sendToQueue(msg.properties.replyTo,
+												channel.sendToQueue(msg.properties.replyTo,
 												 	new Buffer("DIDYOUSAY: " + msg.content.toString() + "???"),
 												 	{correlationId: msg.properties.correlationId});
 										    }, {noAck: true});

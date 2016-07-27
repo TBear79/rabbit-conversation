@@ -25,7 +25,7 @@
   "dependencies": {
     "node-uuid": "^1.4.7",
     "rabbit-chatter": "^1.1.2",
-    "rabbit-listener": "^1.0.2"
+    "rabbit-listener": "^1.0.3"
   },
   "devDependencies": {
     "amqplib": "^0.4.2",
